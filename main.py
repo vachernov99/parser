@@ -6,23 +6,41 @@ import time
 import csv
 
 
-def connection(url):
+def connectionmsk(url):
     session = requests.Session()
     session.headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 OPR/89.0.4447.64 (Edition Yx GX) '}
 
-    cookies = dict(cookies_are='working')
+    cookies = dict(cookies_are='working', geoCityDMIso = "RU-MOW")
     headers = session.headers
-    fullpage = requests.get(url, headers=headers, cookies=cookies)
-    response = fullpage.headers
-    return fullpage
+    try:
+        fullpage = requests.get(url, headers=headers, cookies=cookies)
+        response = fullpage.headers
+    except:
+        print('ошибка подключения')
+    else:
+        return fullpage
+
+def connectionspb(url):
+    session = requests.Session()
+    session.headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 OPR/89.0.4447.64 (Edition Yx GX) '}
+
+    cookies = dict(cookies_are='working', geoCityDMIso = "RU-SPE")
+    headers = session.headers
+    try:
+        fullpage = requests.get(url, headers=headers, cookies=cookies)
+        response = fullpage.headers
+    except:
+        print('ошибка подключения')
+    else:
+        return fullpage
 
 
 def parse(fullpage):
     soup = BeautifulSoup(fullpage.content, 'html.parser')
     iter = 0
     result = list()
-    #< span class ="o_6" > Москва и Московская область < / span >
     sity = soup.find("span", {"class": "o_6"})
     print(sity.text)
 
@@ -30,7 +48,6 @@ def parse(fullpage):
     exit = 0
     for pr in soup.findAll("div", {"class": "u_7 vn ss vc", "class": "u_9 vn"}):
         iter = iter + 1
-        #< div class ="uK" > Нет в наличии < / div >
         try:
             ex = pr.find("div", {"class": "uK"})
             print(ex.text)
@@ -89,43 +106,77 @@ def parse(fullpage):
         id = re.search(r'id/', url)
         id = re.sub(r"\D+", "", url)
 
-        # город
+
         result.append(dict(id = id, title = name, price = priceFloat, promoprice = salepriceFloat, url = url))
         #print(iter, '* ', 'url:', url, 'name:', name, 'price:', priceFloat, 'salePrice:', salepriceFloat, 'id:', id)
 
     return result
 
-def save(parsepage):
-    kol = 1
+def savemsk(parsepage, numstr):
     for st in parsepage:
         resultst = st.values()
         try:
             with open('msk.csv', 'a+') as csvfile:
                 file_write = csv.writer(csvfile)
                 file_write.writerow(resultst)
-                print('запись успешна', str(kol))
-                kol += 1
+                print('запись добавлена', str(numstr))
         except:
             print('ошибка записи')
+        numstr += 1
+    return numstr
+
+#save spb
+def savespb(parsepage, numstr):
+    for st in parsepage:
+        resultst = st.values()
+        try:
+            with open('spb.csv', 'a+') as csvfile:
+                file_write = csv.writer(csvfile)
+                file_write.writerow(resultst)
+                print('запись добавлена', str(numstr))
+        except:
+            print('ошибка записи')
+        numstr += 1
+    return numstr
 
 def main(url):
     urlpage = url
     numpage = 1
-    x = 0
+    numstr = 1
+    #мск
     while True:
-        response = connection(urlpage)
+        response = connectionmsk(urlpage)
 
         parsepage = parse(response)
         if parsepage == 1:
             break
-        save(parsepage)
+        numstr = savemsk(parsepage, numstr)
         print(numpage)
         time.sleep(1)
         numpage = numpage + 1
         numpagestr = str(numpage)
         urlpage = url + '/page/' + numpagestr + '/'
         print(urlpage)
-        x += 1
+
+
+    #спб
+    urlpage = url
+    numpage = 1
+    numstr = 1
+    while True:
+        response = connectionspb(urlpage)
+
+        parsepage = parse(response)
+        if parsepage == 1:
+            break
+        numstr = savespb(parsepage, numstr)
+        print(numpage)
+        time.sleep(1)
+        numpage = numpage + 1
+        numpagestr = str(numpage)
+        urlpage = url + '/page/' + numpagestr + '/'
+        print(urlpage)
+
     print('parser end')
 
 
