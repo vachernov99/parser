@@ -131,19 +131,6 @@ def main(url):
 
 url = 'https://www.detmir.ru/catalog/index/name/lego'
 
-# #r1 = requests.get(url,headers=headers, timeout=3)
-# #co=r1.cookies
-# #print(co)
-# session = requests.Session()
-# session.headers = {
-#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 OPR/89.0.4447.64 (Edition Yx GX) '}
-#
-# cookies = dict(cookies_are='working')
-# headers = session.headers
-# resp = requests.get(url, headers=headers, cookies=cookies)
-# #
-# # x = resp.cookies['dns_cookie_name']
-# # print(x)
-# print(resp.cookies.keys())
+
 main(url)
 
