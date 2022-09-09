@@ -1,4 +1,4 @@
-# parser of the website detmir.ru
-saving data to a csv file
-
-parsed by the cities of Moscow and St. Petersburg
+# Парсер каталога магазина сайта <http://detmir.ru>
+### Полученные данные записываются в csv файл
+---
+Стек: Python, Requests, Bautifulsoup, 
